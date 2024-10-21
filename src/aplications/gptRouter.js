@@ -10,29 +10,29 @@ const openai = new OpenAI({
 
 // Private
 gptRouter.post("/", async (req, res) => {
-  const {tituloTrabajo, area, ubicacion, tipoEmpleo, responsabilidades, requisitos, beneficios, formato} = req.body;
-  const ofertaLaboral = `
-    Oferta de trabajo: ${tituloTrabajo}
-    Área: ${area}
-    Ubicación: ${ubicacion}
-    Tipo de empleo: ${tipoEmpleo}
-
-    Responsabilidades:
-    - ${responsabilidades.join('\n- ')}
-
-    Requisitos:
-    - ${requisitos.join('\n- ')}
-
-    Beneficios:
-    - ${beneficios.join('\n- ')}
-
-    Formato preferido: ${formato}
-  `;
-
-  const prompt = `
-    Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} para la empresa Falabella.`;
-
   try {
+    const {tituloTrabajo, area, ubicacion, tipoEmpleo, responsabilidades, requisitos, beneficios, formato} = req.body;
+    const ofertaLaboral = `\
+      Oferta de trabajo: ${tituloTrabajo}\
+      Área: ${area}\
+      Ubicación: ${ubicacion}\
+      Tipo de empleo: ${tipoEmpleo}\
+\
+      Responsabilidades:\
+      - ${responsabilidades.join('- ')}\
+
+      Requisitos:\
+      - ${requisitos.join('-')}\
+\
+      Beneficios:\
+      - ${beneficios.join('-')}\
+    `;
+
+    const prompt = `\
+      Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} para la empresa Falabella.\
+       Necesito que pongas enfasis en los beneficios ofrecidos por la empresa y entregame un resultado en el siguiente formato ${formato}`;
+
+  
     console.log("Accesing GPT");
 
     // Usamos el método correcto para el endpoint de chat
@@ -42,7 +42,7 @@ gptRouter.post("/", async (req, res) => {
         { role: "system", content: "Eres un asistente que ayuda a escribir ofertas laborales." },
         { role: "user", content: prompt }
       ],
-      max_tokens: 100
+      max_tokens: 1000
     });
 
     res.send({
