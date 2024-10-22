@@ -13,25 +13,47 @@ gptRouter.post("/", async (req, res) => {
   try {
     const {tituloTrabajo, area, ubicacion, tipoEmpleo, responsabilidades, requisitos, beneficios, formato} = req.body;
     const ofertaLaboral = `\
-      Oferta de trabajo: ${tituloTrabajo}\
-      Área: ${area}\
-      Ubicación: ${ubicacion}\
-      Tipo de empleo: ${tipoEmpleo}\
+Oferta de trabajo: ${tituloTrabajo}\
+Área: ${area}\
+Ubicación: ${ubicacion}\
+Tipo de empleo: ${tipoEmpleo}\
 \
-      Responsabilidades:\
-      - ${responsabilidades.join('- ')}\
-
-      Requisitos:\
-      - ${requisitos.join('-')}\
+Responsabilidades:\
+- ${responsabilidades.join('- ')}\
+Requisitos:\
+- ${requisitos.join('-')}\
 \
-      Beneficios:\
-      - ${beneficios.join('-')}\
-    `;
+Beneficios:\
+- ${beneficios.join('-')}\
+`;
 
-    const prompt = `\
-      Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} para la empresa Falabella.\
-       Necesito que pongas enfasis en los beneficios ofrecidos por la empresa y entregame un resultado en el siguiente formato ${formato}`;
-
+let prompt;
+switch (formato) {
+  case 'mensaje':
+    prompt = `\
+      Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} Necesitamos que sea una propuesta atrayente y sin que inventes nada que no te digamos, solo escribe los detalles de manera atrayente.\
+Este es una oferta para la empresa Chilena Falabella, muy seria y con mucha historia en el país.
+Utiliza emojis que simbolicen cada punto importante dentro de la oferta.`
+    break;
+  case 'Linkedin':
+    prompt = `\
+      Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} Necesitamos que sea una propuesta atrayente y sin que inventes nada que no te digamos, solo escribe los detalles de manera atrayente.\
+Este es una oferta para la empresa Chilena Falabella, muy seria y con mucha historia en el país.`
+  case 'Mail':
+    prompt = `\
+      Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} Necesitamos que sea una propuesta atrayente y sin que inventes nada que no te digamos, solo escribe los detalles de manera atrayente.\
+Este es una oferta para la empresa Chilena Falabella, muy seria y con mucha historia en el país.
+Utiliza un lenguaje como si estuvieras tratando con la persona de tú a tú`
+    break;
+  case 'foro':
+    prompt = `\
+    Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} Necesitamos que sea una propuesta atrayente y sin que inventes nada que no te digamos, solo escribe los detalles de manera atrayente.\
+Este es una oferta para la empresa Chilena Falabella, muy seria y con mucha historia en el país.
+Utiliza emojis que simbolicen cada punto importante dentro de la oferta.`
+      break;
+  default:
+    throw new Error('no calza formato');
+}
   
     console.log("Accesing GPT");
 
@@ -42,7 +64,7 @@ gptRouter.post("/", async (req, res) => {
         { role: "system", content: "Eres un asistente que ayuda a escribir ofertas laborales." },
         { role: "user", content: prompt }
       ],
-      max_tokens: 1000
+      max_tokens: 2000
     });
 
     res.send({
