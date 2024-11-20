@@ -1,0 +1,21 @@
+# Use postgres/example user/password credentials
+version: '3.9'
+
+services:
+
+  db:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_DB}
+    ports:
+      - "5432:5432"
+    # networks:
+    #   - api_api-network
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+  
+volumes:
+  db-volume:

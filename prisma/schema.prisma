@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Organization {
+  id                String                @id @default(uuid())
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  name              String                @unique
+  currentPrompt     String?
+  generatedPrompts  GeneratedPrompt[]
+}
+
+model GeneratedPrompt {
+  id                  String                @id @default(uuid())
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  tituloTrabajo       String
+  area                String
+  ubicacion           String
+  tipoEmpleo          String
+  responsabilidades   String
+  requisitos          String
+  beneficios          String
+  formato             String
+  generated           String
+  organization        Organization @relation(fields: [organizationId], references: [id])
+  organizationId      String
+}
+

@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import OpenAI from 'openai';
+import getPromptByOrganizationName from './apps/getPromptByOrganizationName.js';
+import addGeneratedPromptToOrganization from './apps/addGeneratedPromptToOrganization.js';
 
 const gptRouter = Router();
 // Configura OpenAI API
@@ -12,6 +14,10 @@ const openai = new OpenAI({
 gptRouter.post("/", async (req, res) => {
   try {
     const {tituloTrabajo, area, ubicacion, tipoEmpleo, responsabilidades, requisitos, beneficios, formato} = req.body;
+    const _resp = responsabilidades.join('- ')
+    const _req = requisitos.join('-')
+    const _bene = beneficios.join('-')
+
     const ofertaLaboral = `\
 Oferta de trabajo: ${tituloTrabajo}\
 Área: ${area}\
@@ -19,37 +25,32 @@ Ubicación: ${ubicacion}\
 Tipo de empleo: ${tipoEmpleo}\
 \
 Responsabilidades:\
-- ${responsabilidades.join('- ')}\
+- ${_resp}\
 Requisitos:\
-- ${requisitos.join('-')}\
+- ${_req}\
 \
 Beneficios:\
-- ${beneficios.join('-')}\
+- ${_bene}\
 `;
+
+const _context = await getPromptByOrganizationName('Falabella')
+const context = _context || 'Este es una oferta para la empresa Chilena Falabella, muy seria y con mucha historia en el país.'
+
+const _prompt = `Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} Necesitamos que sea una propuesta atrayente y sin que inventes nada que no te digamos, solo escribe los detalles de manera atrayente.\n\
+${context}\n` ;
 
 let prompt;
 switch (formato) {
   case 'mensaje':
-    prompt = `\
-      Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} Necesitamos que sea una propuesta atrayente y sin que inventes nada que no te digamos, solo escribe los detalles de manera atrayente.\
-Este es una oferta para la empresa Chilena Falabella, muy seria y con mucha historia en el país.
-Utiliza emojis que simbolicen cada punto importante dentro de la oferta.`
+    prompt = _prompt.concat(" ", 'Utiliza emojis que simbolicen cada punto importante dentro de la oferta.')
     break;
-  case 'Linkedin':
-    prompt = `\
-      Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} Necesitamos que sea una propuesta atrayente y sin que inventes nada que no te digamos, solo escribe los detalles de manera atrayente.\
-Este es una oferta para la empresa Chilena Falabella, muy seria y con mucha historia en el país.`
+  case 'LinkedIn':
+    prompt = _prompt
   case 'Mail':
-    prompt = `\
-      Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} Necesitamos que sea una propuesta atrayente y sin que inventes nada que no te digamos, solo escribe los detalles de manera atrayente.\
-Este es una oferta para la empresa Chilena Falabella, muy seria y con mucha historia en el país.
-Utiliza un lenguaje como si estuvieras tratando con la persona de tú a tú`
+    prompt = _prompt.concat(" ", 'Utiliza un lenguaje como si estuvieras tratando con la persona de tú a tú')
     break;
   case 'foro':
-    prompt = `\
-    Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} Necesitamos que sea una propuesta atrayente y sin que inventes nada que no te digamos, solo escribe los detalles de manera atrayente.\
-Este es una oferta para la empresa Chilena Falabella, muy seria y con mucha historia en el país.
-Utiliza emojis que simbolicen cada punto importante dentro de la oferta.`
+    prompt = _prompt.concat(" ", 'Utiliza emojis que simbolicen cada punto importante dentro de la oferta.')
       break;
   default:
     throw new Error('no calza formato');
@@ -66,6 +67,21 @@ Utiliza emojis que simbolicen cada punto importante dentro de la oferta.`
       ],
       max_tokens: 2000
     });
+
+    const generatedCV = response.choices[0].message.content.trim()
+
+    const generatedPrompt =  await addGeneratedPromptToOrganization('Falabella', {
+        tituloTrabajo,
+        area,
+        ubicacion,
+        tipoEmpleo,
+        responsabilidades: _resp,
+        requisitos: _req,
+        beneficios: _bene,
+        formato
+      },
+      generatedCV
+    )
 
     res.send({
       prompt: prompt,
