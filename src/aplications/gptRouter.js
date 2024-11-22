@@ -70,6 +70,19 @@ switch (formato) {
 
     const generatedCV = response.choices[0].message.content.trim()
 
+    // Extraer palabras clave del texto generado
+    const keywordPrompt = `A partir del siguiente texto, identifica las palabras clave más importantes en forma de lista:\n\n"${generatedCV}"`;
+    const keywordResponse = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "Eres un asistente que identifica palabras clave en textos." },
+        { role: "user", content: keywordPrompt }
+      ],
+      max_tokens: 2000
+    });
+
+    const keywords = keywordResponse.choices[0].message.content.trim().split("\n").map((kw) => kw.replace(/^-\s*/, '').trim());
+
     const generatedPrompt =  await addGeneratedPromptToOrganization('Falabella', {
         tituloTrabajo,
         area,
@@ -80,15 +93,15 @@ switch (formato) {
         beneficios: _bene,
         formato
       },
-      generatedCV
+      generatedCV,
+      keywords
     )
 
     res.send({
       prompt: prompt,
-      response: response.choices[0].message.content.trim(),
+      response: generatedCV,
+      keywords: keywords
     });
-
-    //TODO: GUARDAR PROMPT EN BDD
   } catch (err) {
     console.error('Error with OpenAI API:', err);
     res.status(500).send({

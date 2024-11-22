@@ -1,6 +1,6 @@
 import prisma from "../../infrastructure/prismaClient.js"
 
-const addGeneratedPromptToOrganization = async (organizationName, promptParams, generated) => {
+const addGeneratedPromptToOrganization = async (organizationName, promptParams, generated, keywords) => {
     try {
         const _prompt = {
             tituloTrabajo: promptParams.tituloTrabajo,
@@ -10,7 +10,8 @@ const addGeneratedPromptToOrganization = async (organizationName, promptParams, 
             responsabilidades: promptParams.responsabilidades,
             requisitos: promptParams.requisitos,
             beneficios: promptParams.beneficios,
-            formato: promptParams.formato
+            formato: promptParams.formato,
+            keywords: keywords
         };
 
         const generatedPrompt = await prisma.generatedPrompt.create({

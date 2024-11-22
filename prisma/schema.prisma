@@ -38,5 +38,6 @@ model GeneratedPrompt {
   generated           String
   organization        Organization @relation(fields: [organizationId], references: [id])
   organizationId      String
+  keywords            String[]
 }
 
