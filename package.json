@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js "
+    "start": "node src/index.js ",
+    "start:prod": "npm run migrate && npm run seed && node src/index.js ",
+    "migrate": "npx prisma migrate dev",
+    "seed": "npx prisma db seed"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
