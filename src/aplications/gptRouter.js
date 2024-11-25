@@ -71,7 +71,7 @@ switch (formato) {
     const generatedCV = response.choices[0].message.content.trim()
 
     // Extraer palabras clave del texto generado
-    const keywordPrompt = `A partir del siguiente texto, identifica las palabras clave más importantes en forma de lista:\n\n"${generatedCV}"`;
+    const keywordPrompt = `A partir del siguiente texto, identifica las palabras clave más importantes (máximo 10) en forma de lista, sin título y evita las palabras clave "Requsitos", "Beneficios" y "Responsabilidades":\n\n"${generatedCV}"`;
     const keywordResponse = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
