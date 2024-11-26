@@ -34,9 +34,11 @@ Beneficios:\
 `;
 
 const _context = await getPromptByOrganizationName('Falabella')
-const context = _context || 'Este es una oferta para la empresa Chilena Falabella, muy seria y con mucha historia en el país.'
+const context = _context || 'Se Requiuere de personas interesantes para aportar en nuestro equipo de trabajo'
 
 const _prompt = `Escribe una oferta laboral en base a los siguientes detalles ${ofertaLaboral} Necesitamos que sea una propuesta atrayente y sin que inventes nada que no te digamos, solo escribe los detalles de manera atrayente.\n\
+Este es una oferta para la empresa Chilena Falabella, muy seria y con mucha historia en el país.
+La siguiente información es relevante para como información de la organización y el perfíl de persona que se busca:\n
 ${context}\n` ;
 
 let prompt;
